@@ -18,6 +18,11 @@ What it does (v0):
 
 Later phases add: screenshot diffing against tests/expect/, perf budgets
 (draw calls, physics tick ms), and scene-tree structural assertions.
+
+Golden test (Phase 1 canonical intent):
+  python qa/run.py --golden templates/golden-demo
+runs golden_test.gd headless: drives "rolling hills terrain 512m + lake +
+golden hour" through the real bridge socket and asserts the resulting scene.
 """
 import argparse
 import os
@@ -69,7 +74,10 @@ def resolve_target(target: str) -> Path:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("target")
+    ap.add_argument("target", nargs="?", default=None,
+                    help="project dir (e.g. templates/base) or module test dir")
+    ap.add_argument("--golden", metavar="PROJECT",
+                    help="run the golden_test.gd bridge end-to-end test in PROJECT")
     ap.add_argument("--godot", default=None)
     ap.add_argument("--timeout", type=int, default=90)
     ap.add_argument("--quit-after", type=int, default=120,
@@ -81,6 +89,12 @@ def main() -> int:
     if not godot:
         print("FAIL: Godot binary not found (set GODOT_BIN or --godot)", file=sys.stderr)
         return 2
+
+    if args.golden:
+        return run_golden(godot, resolve_target(args.golden), args.timeout)
+
+    if not args.target:
+        ap.error("target required (or use --golden PROJECT)")
 
     project = resolve_target(args.target)
     outdir = Path(tempfile.mkdtemp(prefix="hermesforge-qa-"))
@@ -143,6 +157,45 @@ def main() -> int:
     if not args.keep:
         shutil.rmtree(outdir, ignore_errors=True)
     return 0
+
+
+def run_golden(godot: str, project: Path, timeout: int) -> int:
+    """Run the golden_test.gd bridge end-to-end test headless.
+
+    Drives the canonical intent (rolling hills 512m + lake + golden hour)
+    through the real bridge socket and asserts the resulting scene. Exit 0 on
+    9/9 checks, non-zero otherwise.
+    """
+    script = project / "golden_test.gd"
+    if not script.exists():
+        print(f"FAIL: {script} not found", file=sys.stderr)
+        return 2
+    print(f"QA(golden): {godot}")
+    print(f"QA(golden): project = {project}")
+    # Import pass first (GDExtensions like Terrain3D only register after the
+    # .godot/ cache exists — same lesson as the base QA path).
+    print("QA(golden): import pass...")
+    try:
+        subprocess.run([godot, "--headless", "--path", str(project), "--import"],
+                       capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        print("QA(golden): import pass timed out (continuing)")
+    cmd = [godot, "--headless", "--path", str(project), "--script", str(script)]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        out = (proc.stdout or "") + "\n" + (proc.stderr or "")
+        code = proc.returncode
+    except subprocess.TimeoutExpired:
+        print(f"QA(golden): FAIL — timed out after {timeout}s")
+        return 1
+    for line in out.splitlines():
+        if line.strip().startswith("[golden]"):
+            print("  " + line.strip())
+    if code == 0:
+        print("QA(golden): PASS")
+    else:
+        print(f"QA(golden): FAIL (exit {code})")
+    return 0 if code == 0 else 1
 
 
 if __name__ == "__main__":

@@ -1,0 +1,24 @@
+; Engine configuration file.
+; HermesForge golden-demo — Godot 4.7.1
+; Base template + hermes_bridge editor plugin + demo scene with camera/light
+; so scene.screenshot works and the golden test can run.
+
+config_version=5
+
+[application]
+
+config/name="HermesForge Golden Demo"
+run/main_scene="res://demo.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[editor_plugins]
+
+enabled=PackedStringArray("terrain_3d", "gaea", "hermes_bridge")
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+renderer/rendering_method="forward_plus"

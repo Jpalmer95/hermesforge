@@ -11,18 +11,20 @@ Read the plan first: [HERMESFORGE-MASTER-PLAN.md](HERMESFORGE-MASTER-PLAN.md).
 
 ## Status (2026-07-17)
 
-Phase 0 (foundations) in progress. Today this repo contains:
+Phase 0 (foundations) + Phase 1 (MCP bridge) complete. Today this repo contains:
 
 - `modules/` — vendored addons with agent/human manifests:
   - `terrain` — Terrain3D 1.0.2 (C++ GDExtension, MIT)
   - `pcg` — Gaea 2.0.0-beta6 (graph PCG, MIT)
-  - `physics` — Godot Jolt 0.16.0 (MIT)
-- `templates/base` — Godot 4.7.1 project with all modules pre-wired
+  - `physics` — built-in Jolt (MIT; see module AGENT.md for why not the GDExtension)
+- `templates/base` — minimal Godot 4.7.1 project with modules pre-wired
+- `templates/golden-demo` — base + `hermes_bridge` editor plugin + demo scene
+- `bridge/` — the MCP bridge: `hermesforge_mcp.py` (Python MCP server, 11 tools)
+  + the `hermes_bridge` Godot plugin (127.0.0.1:8787)
 - `scripts/validate_modules.py` — enforces the module contract
-- `qa/run.py` — headless QA harness v0
+- `qa/run.py` — headless QA harness (base boot + `--golden` end-to-end test)
 
-Coming next (see master plan): MCP bridge (`hermes_terrain_*`,
-`hermes_water_*`, ...), water + foliage modules, recipes, golden tests.
+Coming next (see master plan): Phase 2 — water/physics/foliage depth + recipes.
 
 ## Quick start
 
@@ -35,8 +37,11 @@ python scripts/validate_modules.py
 # boot the base template headless (QA harness)
 python qa/run.py templates/base
 
-# open the base template in the editor
-godot --path templates/base
+# Phase 1 golden test: rolling hills + lake + golden hour via the MCP bridge
+python qa/run.py --golden templates/golden-demo
+
+# open a template in the editor
+godot --path templates/golden-demo
 ```
 
 ## Layout
