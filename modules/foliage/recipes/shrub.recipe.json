@@ -1,0 +1,31 @@
+{
+  "id": "shrub",
+  "module": "foliage",
+  "description": "Rounded low bushes",
+  "params": {
+    "count": {
+      "type": "int",
+      "default": 200
+    },
+    "area_m": {
+      "type": "float",
+      "default": 200.0
+    },
+    "seed": {
+      "type": "int",
+      "default": 0
+    },
+    "min_spacing": {
+      "type": "float",
+      "default": 2.0
+    },
+    "y_offset": {
+      "type": "float",
+      "default": 0.0
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

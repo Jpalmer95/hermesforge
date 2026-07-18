@@ -76,8 +76,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("target", nargs="?", default=None,
                     help="project dir (e.g. templates/base) or module test dir")
-    ap.add_argument("--golden", metavar="PROJECT",
-                    help="run the golden_test.gd bridge end-to-end test in PROJECT")
+    ap.add_argument("--golden", nargs="?", const="1", default=None,
+                    choices=["1", "2"],
+                    help="run the golden end-to-end test (1=Phase1 intent, 2=Phase2 scene)")
     ap.add_argument("--godot", default=None)
     ap.add_argument("--timeout", type=int, default=90)
     ap.add_argument("--quit-after", type=int, default=120,
@@ -91,10 +92,13 @@ def main() -> int:
         return 2
 
     if args.golden:
-        return run_golden(godot, resolve_target(args.golden), args.timeout)
+        script_name = "golden_test2.gd" if args.golden == "2" else "golden_test.gd"
+        project = resolve_target(args.target) if args.target \
+            else ROOT / "templates" / "golden-demo"
+        return run_golden(godot, project, args.timeout, script_name)
 
     if not args.target:
-        ap.error("target required (or use --golden PROJECT)")
+        ap.error("target required (or use --golden [1|2] with optional target)")
 
     project = resolve_target(args.target)
     outdir = Path(tempfile.mkdtemp(prefix="hermesforge-qa-"))
@@ -159,14 +163,13 @@ def main() -> int:
     return 0
 
 
-def run_golden(godot: str, project: Path, timeout: int) -> int:
-    """Run the golden_test.gd bridge end-to-end test headless.
+def run_golden(godot: str, project: Path, timeout: int, script_name: str = "golden_test.gd") -> int:
+    """Run a golden bridge end-to-end test headless.
 
-    Drives the canonical intent (rolling hills 512m + lake + golden hour)
-    through the real bridge socket and asserts the resulting scene. Exit 0 on
-    9/9 checks, non-zero otherwise.
+    script_name: golden_test.gd (Phase 1 intent) or golden_test2.gd (Phase 2
+    scene: floating crates + pine shoreline + vehicle). Exit 0 on all checks.
     """
-    script = project / "golden_test.gd"
+    script = project / script_name
     if not script.exists():
         print(f"FAIL: {script} not found", file=sys.stderr)
         return 2
@@ -189,8 +192,9 @@ def run_golden(godot: str, project: Path, timeout: int) -> int:
         print(f"QA(golden): FAIL — timed out after {timeout}s")
         return 1
     for line in out.splitlines():
-        if line.strip().startswith("[golden]"):
-            print("  " + line.strip())
+        s = line.strip()
+        if s.startswith("[golden]") or s.startswith("[golden2]"):
+            print("  " + s)
     if code == 0:
         print("QA(golden): PASS")
     else:

@@ -27,7 +27,7 @@ Two halves:
   (inline `mcp` dep — no system install). If the editor is offline, every tool
   returns a clean "bridge unreachable" error instead of hanging.
 
-## Tools (11)
+## Tools (21)
 
 | tool | what it does |
 |------|--------------|
@@ -38,10 +38,20 @@ Two halves:
 | `hermes_terrain_generate` | Terrain3D heightfield from a recipe (rolling_hills / mountain_range / island) |
 | `hermes_terrain_sculpt` | raise/lower terrain in a radius |
 | `hermes_terrain_info` | terrain presence, region size, height range |
-| `hermes_water_create` | water body (lake / ocean / river_spline / pond) |
+| `hermes_water_create` | water body w/ Gerstner surface (lake / pond / ocean / river_spline / calm_pool) |
 | `hermes_water_remove` | remove the water body |
+| `hermes_water_float_on_water` | register a RigidBody3D to float (buoyancy) |
+| `hermes_water_list` | active water params + recipes |
 | `hermes_sky_set` | sky/sun/fog preset (golden_hour / midday / overcast_storm / clear_night) |
-| `hermes_physics_audit` | bodies missing collision shapes, Jolt status |
+| `hermes_physics_audit` | bodies missing collision, dynamic-trimesh traps, Jolt status |
+| `hermes_physics_collision_autogen` | convex/box/sphere/trimesh collision for a mesh |
+| `hermes_physics_vehicle` | spawn a 4-wheel VehicleBody3D (vehicle_arcade / vehicle_sim) |
+| `hermes_physics_ragdoll` | flag a humanoid Skeleton3D for ragdoll |
+| `hermes_physics_tune` | Jolt solver preset (performance / balanced / quality) |
+| `hermes_physics_add_test_body` | simple RigidBody3D for testing |
+| `hermes_foliage_scatter` | MultiMesh foliage over terrain (pine / jungle / alpine / rock / grass / shrub) |
+| `hermes_foliage_clear` | remove scattered foliage (one group or all) |
+| `hermes_foliage_list` | scattered groups + instance counts |
 
 ## Setup
 

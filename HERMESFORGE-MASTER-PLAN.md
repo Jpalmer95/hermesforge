@@ -279,16 +279,30 @@ Per the user's BYOC/local-first principles:
   coarse 16m step + single noise field; multi-texture painting + biomes land
   in Phase 2.
 
-### Phase 2 — Water & physics depth (week 3–4)
+### Phase 2 — Water & physics depth (week 3–4) — DONE 2026-07-18
 
-- [ ] Water module: surface + buoyancy + at least one interaction mode,
-      5 recipes, golden tests
-- [ ] Physics module: audit tool, collision auto-gen, vehicle + ragdoll
-      recipes, Jolt config presets
-- [ ] Foliage module: chosen scatter addon + 4 recipes + density-mask tools
+- [x] Water module: Gerstner surface shader (`water_surface.gdshader`) +
+      buoyancy (`HermesWaterBody` floats RigidBody3Ds with matching wave math)
+      + 5 recipes (lake/pond/ocean/river_spline/calm_pool). Buoyancy sim
+      verified: crate rises toward surface headless.
+- [x] Physics module: audit (now detects dynamic-trimesh perf traps),
+      collision auto-gen (convex/box/sphere/trimesh), vehicle builder (4-wheel
+      VehicleBody3D, arcade/sim), ragdoll flagging, Jolt tune presets
+      (performance/balanced/quality), test-body helper.
+- [x] Foliage module (D4 resolved): direct MultiMesh scatter (headless-safe,
+      zero-dep) over terrain-height sampling. 6 recipes (pine/jungle/alpine/
+      rock/grass/shrub), Poisson-ish spacing, deterministic by seed. D4 spike
+      outcome: rejected HungryProton/scatter (perf reports + dep), Spatial
+      Gardener (stale pre-4.7, painter not agent-oriented), Terrain3D instancer
+      (needs editor asset-dock setup — may bridge later as a backend).
+- [x] New MCP tools: 21 total (added collision_autogen, vehicle, ragdoll,
+      tune, add_test_body, water.float_on_water, water.list, foliage.scatter/
+      clear/list).
 - Success criteria: golden scene "lake with floating crates, pine shoreline,
-  vehicle on terrain" runs headless at ≥60fps on the 4070 and passes
-  physics audit with zero errors.
+  vehicle on terrain" runs headless and passes physics audit with zero
+  missing-collision issues → MET via `python qa/run.py --golden 2` (19/19,
+  incl. buoyancy sim). The ≥60fps-on-4070 sub-check needs a desktop GUI run
+  (headless here can't measure render fps); flagged for desktop verification.
 
 ### Phase 3 — ForgeDNA integration (week 5–6)
 

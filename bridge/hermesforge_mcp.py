@@ -165,8 +165,101 @@ def hermes_sky_set(recipe: str = "midday") -> str:
 @mcp.tool()
 def hermes_physics_audit() -> str:
     """Audit the open scene: physics bodies, how many lack collision shapes,
-    and whether built-in Jolt is active. Returns an issue list."""
+    dynamic-trimesh perf traps, and whether built-in Jolt is active."""
     return _fmt(_post("physics.audit", {}))
+
+
+# ---- physics depth (Phase 2) ----
+
+@mcp.tool()
+def hermes_physics_collision_autogen(node: str, mode: str = "convex") -> str:
+    """Auto-generate collision for a MeshInstance3D. mode: convex (default,
+    best for dynamic) | box | sphere | trimesh (static only). Wraps the mesh in
+    a StaticBody3D if it has no physics body parent."""
+    return _fmt(_post("physics.collision_autogen", {"node": node, "mode": mode}))
+
+
+@mcp.tool()
+def hermes_physics_vehicle(
+    recipe: str = "vehicle_arcade",
+    at: list[float] = [0, 2, 0],
+) -> str:
+    """Spawn a 4-wheel VehicleBody3D rig. recipe: vehicle_arcade (high grip) |
+    vehicle_sim (weighty). Returns the rig node name (HermesVehicle)."""
+    return _fmt(_post("physics.vehicle", {"recipe": recipe, "at": list(at)}))
+
+
+@mcp.tool()
+def hermes_physics_ragdoll(node: str) -> str:
+    """Flag a humanoid Skeleton3D for ragdoll (physical bones). node = skeleton
+    name. Full generation runs in-editor where the skeleton pose is available."""
+    return _fmt(_post("physics.ragdoll", {"node": node}))
+
+
+@mcp.tool()
+def hermes_physics_tune(preset: str = "balanced") -> str:
+    """Set Jolt solver quality preset: performance (6/1) | balanced (10/2) |
+    quality (16/4) velocity/position steps."""
+    return _fmt(_post("physics.tune", {"preset": preset}))
+
+
+@mcp.tool()
+def hermes_physics_add_test_body(
+    name: str = "TestBody",
+    shape: str = "box",
+    mass: float = 1.0,
+    at: list[float] = [0, 2, 0],
+) -> str:
+    """Add a simple RigidBody3D (box|sphere) — for testing buoyancy/physics."""
+    return _fmt(_post("physics.add_test_body", {
+        "name": name, "shape": shape, "mass": mass, "at": list(at)}))
+
+
+# ---- water depth (Phase 2) ----
+
+@mcp.tool()
+def hermes_water_float_on_water(node: str) -> str:
+    """Register a named RigidBody3D to float on the HermesWater surface using
+    buoyancy. Create water first via hermes_water_create."""
+    return _fmt(_post("water.float_on_water", {"node": node}))
+
+
+@mcp.tool()
+def hermes_water_list() -> str:
+    """Report the active water body: position, wave params, available recipes."""
+    return _fmt(_post("water.list", {}))
+
+
+# ---- foliage (Phase 2) ----
+
+@mcp.tool()
+def hermes_foliage_scatter(
+    recipe: str = "pine",
+    count: int = 200,
+    area_m: float = 200.0,
+    seed: int = 0,
+    min_spacing: float = 2.0,
+    y_offset: float = 0.0,
+    name: str = "",
+) -> str:
+    """Scatter foliage meshes across terrain via MultiMeshInstance3D, placed on
+    the terrain surface. recipe: pine | jungle | alpine | rock | grass | shrub.
+    Deterministic for a given seed. Idempotent per name."""
+    return _fmt(_post("foliage.scatter", {
+        "recipe": recipe, "count": count, "area_m": area_m, "seed": seed,
+        "min_spacing": min_spacing, "y_offset": y_offset, "name": name}))
+
+
+@mcp.tool()
+def hermes_foliage_clear(name: str = "") -> str:
+    """Remove scattered foliage. name = specific group, or empty to clear all."""
+    return _fmt(_post("foliage.clear", {"name": name}))
+
+
+@mcp.tool()
+def hermes_foliage_list() -> str:
+    """List scattered foliage groups and their instance counts."""
+    return _fmt(_post("foliage.list", {}))
 
 
 def main() -> None:

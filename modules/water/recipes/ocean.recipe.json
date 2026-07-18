@@ -1,0 +1,35 @@
+{
+  "id": "ocean",
+  "module": "water",
+  "description": "Big slow swells, deep blue",
+  "params": {
+    "at": {
+      "type": "vec3",
+      "default": [
+        0,
+        0,
+        0
+      ]
+    },
+    "radius": {
+      "type": "float",
+      "default": 48.0
+    },
+    "wave_height": {
+      "type": "float",
+      "default": 0.25
+    },
+    "wave_scale": {
+      "type": "float",
+      "default": 0.6
+    },
+    "wave_speed": {
+      "type": "float",
+      "default": 1.0
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

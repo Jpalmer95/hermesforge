@@ -166,7 +166,7 @@ func _health_payload() -> Dictionary:
 
 func _register_handlers() -> void:
 	var base := "res://addons/hermes_bridge/handlers/"
-	for fname in ["scene_handler.gd", "terrain_handler.gd", "water_handler.gd", "sky_handler.gd", "physics_handler.gd"]:
+	for fname in ["scene_handler.gd", "terrain_handler.gd", "water_handler.gd", "sky_handler.gd", "physics_handler.gd", "foliage_handler.gd"]:
 		var h = load(base + fname).new()
 		h.setup(self)
 		for op in h.get_ops():
