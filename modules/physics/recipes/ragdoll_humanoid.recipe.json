@@ -1,0 +1,23 @@
+{
+  "id": "ragdoll_humanoid",
+  "module": "physics",
+  "description": "Physical-bone ragdoll from a standard humanoid skeleton",
+  "params": {
+    "mass_kg": {
+      "type": "float",
+      "default": 75.0
+    },
+    "joint_damp": {
+      "type": "float",
+      "default": 0.6
+    },
+    "self_collide": {
+      "type": "bool",
+      "default": false
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

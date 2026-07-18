@@ -1,0 +1,31 @@
+{
+  "id": "vehicle_sim",
+  "module": "physics",
+  "description": "Weighty sim-ish car: realistic grip, body roll, slower steering",
+  "params": {
+    "mass_kg": {
+      "type": "float",
+      "default": 1450.0
+    },
+    "engine_force": {
+      "type": "float",
+      "default": 1400.0
+    },
+    "grip": {
+      "type": "float",
+      "default": 1.0
+    },
+    "steer_speed": {
+      "type": "float",
+      "default": 1.8
+    },
+    "anti_roll": {
+      "type": "float",
+      "default": 0.3
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

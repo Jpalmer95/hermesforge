@@ -1,0 +1,40 @@
+{
+  "id": "rolling_hills",
+  "module": "terrain",
+  "description": "Gentle rolling hills, ~1km, grass + dirt blend",
+  "params": {
+    "size_m": {
+      "type": "int",
+      "default": 1024,
+      "min": 128,
+      "max": 8192
+    },
+    "seed": {
+      "type": "int",
+      "default": 0
+    },
+    "amplitude": {
+      "type": "float",
+      "default": 30.0,
+      "min": 2.0,
+      "max": 400.0
+    },
+    "frequency": {
+      "type": "float",
+      "default": 0.004
+    },
+    "biome": {
+      "type": "enum",
+      "values": [
+        "temperate",
+        "alpine",
+        "desert"
+      ],
+      "default": "temperate"
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

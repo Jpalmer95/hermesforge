@@ -1,0 +1,29 @@
+{
+  "id": "dungeon_layout",
+  "module": "pcg",
+  "description": "BSP room-and-corridor dungeon with entrance/exit",
+  "params": {
+    "size": {
+      "type": "int",
+      "default": 96
+    },
+    "seed": {
+      "type": "int",
+      "default": 0
+    },
+    "room_count": {
+      "type": "int",
+      "default": 12,
+      "min": 3,
+      "max": 64
+    },
+    "corridor_w": {
+      "type": "int",
+      "default": 2
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

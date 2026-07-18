@@ -1,0 +1,33 @@
+{
+  "id": "cave_system",
+  "module": "pcg",
+  "description": "Cellular-automata cave network (gridmap/tilemap)",
+  "params": {
+    "size": {
+      "type": "int",
+      "default": 128,
+      "min": 32,
+      "max": 1024
+    },
+    "seed": {
+      "type": "int",
+      "default": 0
+    },
+    "fill_chance": {
+      "type": "float",
+      "default": 0.45
+    },
+    "smooth_steps": {
+      "type": "int",
+      "default": 4
+    },
+    "min_room_size": {
+      "type": "int",
+      "default": 12
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

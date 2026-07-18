@@ -1,0 +1,31 @@
+{
+  "id": "vehicle_arcade",
+  "module": "physics",
+  "description": "Forgiving arcade car: high grip, low roll, snappy steering",
+  "params": {
+    "mass_kg": {
+      "type": "float",
+      "default": 1200.0
+    },
+    "engine_force": {
+      "type": "float",
+      "default": 1800.0
+    },
+    "grip": {
+      "type": "float",
+      "default": 2.2
+    },
+    "steer_speed": {
+      "type": "float",
+      "default": 4.0
+    },
+    "anti_roll": {
+      "type": "float",
+      "default": 0.8
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}

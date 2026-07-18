@@ -1,0 +1,33 @@
+{
+  "id": "mountain_range",
+  "module": "terrain",
+  "description": "Ridged alpine mountain chain with valley floor",
+  "params": {
+    "size_m": {
+      "type": "int",
+      "default": 2048,
+      "min": 512,
+      "max": 8192
+    },
+    "seed": {
+      "type": "int",
+      "default": 0
+    },
+    "amplitude": {
+      "type": "float",
+      "default": 220.0
+    },
+    "ridge_gain": {
+      "type": "float",
+      "default": 0.6
+    },
+    "snowline_m": {
+      "type": "float",
+      "default": 140.0
+    }
+  },
+  "emits": {
+    "nodes": [],
+    "signals": []
+  }
+}
