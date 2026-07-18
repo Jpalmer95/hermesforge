@@ -66,18 +66,19 @@ Two halves:
 ## Verify (headless, no editor needed)
 
 ```bash
-python qa/run.py --golden templates/golden-demo
+python qa/run.py --golden 1   # Phase 1 intent: terrain + lake + golden hour (9/9)
+python qa/run.py --golden 2   # Phase 2 scene: + buoyancy, foliage, vehicle (19/19)
 ```
 
-Runs `golden_test.gd`: drives the canonical intent through the real socket and
-asserts the resulting scene (9/9 checks). This is the Phase 1 success gate.
+Runs `golden_test.gd` / `golden_test2.gd`: drives the canonical intent through
+the real socket and asserts the resulting scene. These are the success gates.
 
 ## Adding a tool
 
 1. Add a handler method in `addons/hermes_bridge/handlers/<domain>_handler.gd`
    and register its op id in `get_ops()`.
 2. Add a matching `@mcp.tool()` in `bridge/hermesforge_mcp.py` that POSTs the op.
-3. Re-run `python qa/run.py --golden templates/golden-demo`.
+3. Re-run `python qa/run.py --golden 1` and `python qa/run.py --golden 2`.
 
 Keep ops JSON-serializable and synchronous (no `await` across dispatch).
 

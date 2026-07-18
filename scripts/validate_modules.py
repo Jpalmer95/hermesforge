@@ -112,8 +112,15 @@ def validate_module(mod_dir: Path, errors: list):
         if rdata.get("module") and rdata["module"] != name:
             fail(errors, name, f"recipe '{recipe_id}' module field != '{name}'")
 
-    if not (mod_dir / "tests").is_dir():
+    # tests/ contract: a module either ships its own golden test dir(s), or
+    # documents where its end-to-end coverage lives (the templates/golden-demo
+    # harness). A tests/README.md pointing at the golden tests satisfies the
+    # contract; a bare empty tests/ dir does not (it's untracked by git anyway).
+    tests_dir = mod_dir / "tests"
+    if not tests_dir.is_dir():
         fail(errors, name, "tests/ folder missing")
+    elif not any(tests_dir.iterdir()):
+        fail(errors, name, "tests/ folder empty (add a golden test or a README.md pointing at templates/golden-demo)")
 
 
 def main() -> int:

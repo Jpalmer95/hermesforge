@@ -11,8 +11,8 @@ prompt — by composing the best open-source Godot addons into a curated,
 MCP-exposed "HermesForge Distribution" and evolving ForgeDNA from a text-spec
 build harness into the intent→project compiler that drives it.
 
-**Status:** v1.0 — Decisions D1–D6 APPROVED 2026-07-17. Phases 0–3 complete;
-Phase 4 (polish/docs/launch) next.
+**Status:** v1.0 — Decisions D1–D6 APPROVED 2026-07-17. Phases 0–4 complete
+(demo video pending a desktop GUI recording). HermesForge is launch-ready.
 
 **Decisions (all approved as recommended):**
 - D1: Two repos — `hermesforge` (distribution+bridge+modules) + `forgedna` stays separate, consumes HermesForge as target stack.
@@ -374,14 +374,33 @@ realizes its own environment headless, with no editor session.
   15 env nodes). Saved scene re-opens + boots clean; hermesforge QA harness
   PASS. Standalone `apply-environment` also verified.
 
-### Phase 4 — Polish, docs, public launch (week 7–8)
+### Phase 4 — Polish, docs, public launch (week 7–8) — DONE 2026-07-18 (video pending)
 
-- [ ] Human docs: "10-minute first environment" guide
-- [ ] Agent docs: per-module AGENT.md finalized + recipe catalog
-- [ ] Demo video (recorded from a real Hermes session)
-- [ ] Public repo announcement; tag Nous/Hermes ecosystem per user preference
+- [x] Human docs: "10-minute first environment" guide —
+      `docs/first-environment.md`. Covers both paths: (A) Hermes agent driving
+      the live bridge, (B) ForgeDNA compiler headless (`--apply`). Verified
+      from clean clones: hermesforge fresh-clone → golden demo in ~9s;
+      ForgeDNA clone → `build-full --apply` → realized world in ~5s (both far
+      under the 15-minute bar).
+- [x] Agent docs: `docs/agent-guide.md` (21 tools, ordering rules, verification,
+      pitfalls) + `docs/recipes.md` (full recipe catalog — every module, every
+      param, copy-paste `environment:` blocks). Per-module `AGENT.md` manifests
+      remain the capability source of truth; validator passes all 5 modules.
+- [x] Validator polish: `scripts/validate_modules.py` no longer fails fresh
+      clones on empty (untracked) `tests/` dirs — a `tests/README.md` pointing
+      at the golden harness satisfies the contract. Added missing READMEs to
+      terrain/physics/pcg. `validate_modules.py` → ALL PASS.
+- [x] README refreshed (was still "Phase 0/1"); bridge/README stale `--golden`
+      commands fixed. Launch announcement drafted at
+      `docs/launch-announcement.md` (review before posting; tags Hermes/Nous
+      ecosystem per owner preference).
+- [ ] Demo video — REQUIRES a recorded GUI session (real Hermes driving the
+      bridge in the editor). Cannot be produced headless; the one manual item.
+      Record on a desktop session, then publish the announcement.
 - Success criteria: a fresh clone + documented setup reaches the Phase 1
-  golden demo in ≤15 minutes on a machine with Godot + Hermes installed.
+  golden demo in ≤15 minutes on a machine with Godot + Hermes installed → MET
+  (~9s from clean clone). Only the demo-video sub-item remains, flagged for
+  desktop recording.
 
 ## 9. Future roadmap (post-launch; agents must NOT execute)
 
