@@ -43,13 +43,25 @@ func _water_create(args: Dictionary) -> Dictionary:
 	var radius := float(args.get("radius", 48.0))
 	var p: Dictionary = RECIPES[recipe]
 
-	var existing := _find_node_by_name(root, "HermesWater")
-	if existing:
-		existing.queue_free()
+	# Multiple water bodies coexist. Naming: an explicit `name` replaces that
+	# exact node (idempotent re-apply); the default first body is HermesWater,
+	# and each additional unnamed body gets a suffix (HermesWater2, ...).
+	var explicit_name: String = str(args.get("name", ""))
+	var node_name := "HermesWater"
+	if explicit_name != "":
+		node_name = explicit_name
+		var dupe := _find_node_by_name(root, node_name)
+		if dupe:
+			dupe.queue_free()
+	else:
+		var suffix := 2
+		while _find_node_by_name(root, node_name):
+			node_name = "HermesWater%d" % suffix
+			suffix += 1
 
 	# Water body (holds params + buoyancy) with a MeshInstance3D surface child.
 	var body: Node3D = load(WATER_BODY).new()
-	body.name = "HermesWater"
+	body.name = node_name
 	body.position = at
 	body.wave_height = p["wave_height"]
 	body.wave_scale = p["wave_scale"]
@@ -81,23 +93,37 @@ func _water_create(args: Dictionary) -> Dictionary:
 	surf.owner = root
 	return _ok({
 		"recipe": recipe, "at": [at.x, at.y, at.z], "radius": radius,
-		"node": "HermesWater", "wave_height": p["wave_height"],
+		"node": node_name, "wave_height": p["wave_height"],
 	})
 
 
-func _water_remove(_args: Dictionary) -> Dictionary:
+func _water_remove(args: Dictionary) -> Dictionary:
 	var root := _editor_root()
-	var w := _find_node_by_name(root, "HermesWater") if root else null
-	if w == null:
-		return _err("no HermesWater node present")
-	w.queue_free()
-	return _ok({"removed": true})
+	if root == null:
+		return _err("no scene open")
+	# Remove a specific named body, or ALL HermesWater bodies when no name given.
+	var target := str(args.get("name", ""))
+	var removed := 0
+	for child in root.get_children():
+		if child.name.begins_with("HermesWater") and (target == "" or child.name == target):
+			child.queue_free()
+			removed += 1
+	if removed == 0:
+		return _err("no HermesWater node present" if target == "" else "no water body named '%s'" % target)
+	return _ok({"removed": removed})
 
 
 func _water_float(args: Dictionary) -> Dictionary:
-	# Register a named RigidBody3D to float on the water.
+	# Register a named RigidBody3D to float on a water body (first HermesWater
+	# unless `on` names a specific body).
 	var root := _editor_root()
-	var body := _find_node_by_name(root, "HermesWater") if root else null
+	var on := str(args.get("on", ""))
+	var body: Node = null
+	if root:
+		for child in root.get_children():
+			if child.name.begins_with("HermesWater") and (on == "" or child.name == on):
+				body = child
+				break
 	if body == null:
 		return _err("no HermesWater present — create water first")
 	var target_name := str(args.get("node", ""))
@@ -109,16 +135,17 @@ func _water_float(args: Dictionary) -> Dictionary:
 	if not (target is RigidBody3D):
 		return _err("node is not a RigidBody3D", {"node": target_name, "type": target.get_class()})
 	body.register_floater(target)
-	return _ok({"floating": target_name, "on": "HermesWater"})
+	return _ok({"floating": target_name, "on": body.name})
 
 
 func _water_list() -> Dictionary:
 	var root := _editor_root()
-	var w := _find_node_by_name(root, "HermesWater") if root else null
-	if w == null:
-		return _ok({"present": false})
-	return _ok({
-		"present": true, "position": [w.position.x, w.position.y, w.position.z],
-		"wave_height": w.wave_height, "wave_scale": w.wave_scale,
-		"recipes": RECIPES.keys(),
-	})
+	var bodies := []
+	if root:
+		for child in root.get_children():
+			if child.name.begins_with("HermesWater"):
+				bodies.append({
+					"node": child.name, "position": [child.position.x, child.position.y, child.position.z],
+					"wave_height": child.wave_height, "wave_scale": child.wave_scale,
+				})
+	return _ok({"present": bodies.size() > 0, "count": bodies.size(), "bodies": bodies, "recipes": RECIPES.keys()})

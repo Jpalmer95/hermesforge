@@ -347,6 +347,33 @@ Per the user's BYOC/local-first principles:
   hook (headless `godot --headless --script apply_environment.gd`) is a clean
   follow-up if we want zero-touch realization.
 
+### Phase 3.5 — Zero-touch build→world (no editor session) — DONE 2026-07-18
+
+Closes the Phase 3 "realize it in-scene" gap: the generated project now
+realizes its own environment headless, with no editor session.
+
+- [x] `environment_apply.gd` written into every HermesForge-base project — a
+      SceneTree script (same loopback-socket pattern as the golden tests) that
+      loads `environment/environment.manifest.json`, drives terrain → water →
+      foliage → sky through the real bridge ops, packs the resulting nodes into
+      `main.tscn` (with owner-stamping so bridge-created children persist), and
+      structurally verifies the world (Terrain3D / HermesWater / Foliage_* /
+      WorldEnvironment present). Exit 0 = realized + saved.
+- [x] Bridge water handler now supports MULTIPLE coexisting water bodies
+      (HermesWater, HermesWater2, …; explicit `name` = idempotent replace).
+      `water.remove`/`water.list`/`water.float_on_water` updated to match.
+      Golden tests 1 (9/9) + 2 (19/19, incl. buoyancy sim) still pass.
+- [x] CLI: `forgedna-harness build-full <dna> --apply` (build → realize in one
+      command) + standalone `forgedna-harness apply-environment <project>`.
+      New `harness/environment_apply.py` runs the headless Godot subprocess
+      (finds Godot via arg / $GODOT_BIN / PATH), captures the apply log, and
+      reports applied ops.
+- Verified end-to-end: `build-full examples/quiet-hollow-hermesforge.json
+  --apply` → 14/14 apply checks pass → `main.tscn` contains a real world
+  (Terrain3D, 3 foliage MultiMeshes, 2 water bodies, WorldEnvironment + Sun —
+  15 env nodes). Saved scene re-opens + boots clean; hermesforge QA harness
+  PASS. Standalone `apply-environment` also verified.
+
 ### Phase 4 — Polish, docs, public launch (week 7–8)
 
 - [ ] Human docs: "10-minute first environment" guide
