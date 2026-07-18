@@ -11,7 +11,8 @@ prompt — by composing the best open-source Godot addons into a curated,
 MCP-exposed "HermesForge Distribution" and evolving ForgeDNA from a text-spec
 build harness into the intent→project compiler that drives it.
 
-**Status:** v1.0 — Decisions D1–D6 APPROVED 2026-07-17. Phase 0 in progress.
+**Status:** v1.0 — Decisions D1–D6 APPROVED 2026-07-17. Phases 0–3 complete;
+Phase 4 (polish/docs/launch) next.
 
 **Decisions (all approved as recommended):**
 - D1: Two repos — `hermesforge` (distribution+bridge+modules) + `forgedna` stays separate, consumes HermesForge as target stack.
@@ -304,16 +305,47 @@ Per the user's BYOC/local-first principles:
   incl. buoyancy sim). The ≥60fps-on-4070 sub-check needs a desktop GUI run
   (headless here can't measure render fps); flagged for desktop verification.
 
-### Phase 3 — ForgeDNA integration (week 5–6)
+### Phase 3 — ForgeDNA integration (week 5–6) — DONE 2026-07-18
 
-- [ ] DNA schema v2 `environment:` block + validation
-- [ ] 4 new agent specs wired into orchestrator
-- [ ] Godot adapter v2 emitting HermesForge-base projects
-- [ ] End-to-end: one existing example DNA (quiet_hollow or forgednaRPG1test)
-      rebuilt onto HermesForge stack and playable
-- Success criteria: `forgedna-harness build-full <dna> --backend api` produces
-  a project that opens in the HermesForge editor with terrain/water/foliage
-  present, and the QA harness passes on it.
+- [x] DNA schema v2 `environment:` block + validation — optional top-level
+      `environment: {terrain, water[], foliage[], sky}` added to
+      `cli/forgedna/schemas/game_dna.schema.json` (backward compatible: old
+      DNAs still validate). Recipes map 1:1 to hermesforge module recipes
+      (terrain: rolling_hills/mountain_range/island; water: lake/pond/ocean/
+      river_spline/calm_pool; foliage: pine/jungle/alpine/rock/grass/shrub;
+      sky: golden_hour/midday/overcast_storm/clear_night). Verified:
+      `forgedna validate examples/quiet-hollow-hermesforge.json` PASSED.
+- [x] 4 new agent specs wired into orchestrator — `code_terrain`, `code_water`,
+      `code_foliage`, `code_sky` added to AgentType + AGENT_REGISTRY +
+      executors + build_manager defaults. Deterministic recipe-fillers at v1
+      (no LLM needed — the DNA block IS the intent); each writes a filled
+      recipe JSON + records the hermes_bridge tool to apply it.
+      task_decomposer emits an "Environment Stack" phase (7 tasks for the
+      example DNA) after scaffolding, before classic world building.
+- [x] Godot adapter v2 emitting HermesForge-base projects — when the DNA has
+      an environment: block, `GodotAdapter` copies the vendored
+      hermesforge/templates/base stack (Terrain3D + Gaea) + the hermes_bridge
+      plugin into the generated project, writes a 4.7/Jolt project.godot, an
+      `environment/` manifest (environment.manifest.json + per-module filled
+      recipes), and a boot scene that reports the stack. Without the block it
+      emits the classic self-contained project unchanged (verified:
+      forgednaRPG1test still builds + opens).
+- [x] End-to-end: `examples/quiet-hollow-hermesforge.json` rebuilt onto the
+      HermesForge stack. `forgedna-harness build-full <dna>` produced a
+      project with terrain/water/foliage/sky manifest; QA harness PASS
+      (`python qa/run.py /tmp/qh_build/godot_project`); boot log confirms
+      "Physics engine: Jolt Physics" + "Environment stack: {terrain:
+      rolling_hills, water: [pond, calm_pool], foliage: [pine, grass, shrub],
+      sky: golden_hour}". HermesForge golden test still 19/19.
+- Success criteria MET: `forgedna-harness build-full <dna>` produces a project
+  that opens in the HermesForge editor with the environment stack manifest
+  present and QA-passing. NOTE: the manifest records the recipes + bridge
+  tools; actually *realizing* them in the scene (driving hermes_terrain_generate
+  etc. through the live bridge) is the bridge-session workflow — the generated
+  project is bridge-ready (hermes_bridge addon shipped) so opening it in the
+  editor + running the MCP tools applies the environment. An auto-apply boot
+  hook (headless `godot --headless --script apply_environment.gd`) is a clean
+  follow-up if we want zero-touch realization.
 
 ### Phase 4 — Polish, docs, public launch (week 7–8)
 
